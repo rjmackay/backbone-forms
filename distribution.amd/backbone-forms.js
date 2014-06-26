@@ -71,6 +71,7 @@ var Form = Backbone.View.extend({
     this.Fieldset = options.Fieldset || this.Fieldset || constructor.Fieldset;
     this.Field = options.Field || this.Field || constructor.Field;
     this.NestedField = options.NestedField || this.NestedField || constructor.NestedField;
+    this.NestedForm = options.NestedForm || this.NestedForm || constructor.NestedForm;
 
     //Check which fields will be included (defaults to all)
     var selectedFields = this.selectedFields = options.fields || _.keys(schema);
@@ -1031,6 +1032,19 @@ Form.NestedField = Form.Field.extend({
       <% } %>\
       <div data-error></div>\
     </div>\
+  ', null, Form.templateSettings)
+
+});
+
+
+//==================================================================================================
+//NESTEDFIELD
+//==================================================================================================
+
+Form.NestedForm = Form.extend({
+
+  template: _.template('\
+    <span data-fieldsets></span>\
   ', null, Form.templateSettings)
 
 });
@@ -2005,11 +2019,9 @@ Form.editors.Object = Form.editors.Base.extend({
     //Check required options
     if (!this.form) throw new Error('Missing required option "form"');
     if (!this.schema.subSchema) throw new Error("Missing required 'schema.subSchema' option for Object editor");
-  },
 
-  render: function() {
     //Get the constructor for creating the nested form; i.e. the same constructor as used by the parent form
-    var NestedForm = this.form.constructor;
+    var NestedForm = this.form.NestedForm;
 
     //Create the nested form
     this.nestedForm = new NestedForm({
@@ -2018,6 +2030,9 @@ Form.editors.Object = Form.editors.Base.extend({
       idPrefix: this.id + '_',
       Field: NestedForm.NestedField
     });
+  },
+
+  render: function() {
 
     this._observeFormEvents();
 
